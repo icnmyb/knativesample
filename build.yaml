@@ -1,0 +1,18 @@
+apiVersion: build.knative.dev/v1alpha1
+kind: Build
+metadata:
+  name: port
+  namespace: default
+spec:
+  serviceAccountName: build-bot
+  source:
+    git:
+      url: {リポジトリのパス}
+      revision: feature/cronjob
+  template:
+    name: kaniko
+    arguments:
+    - name: IMAGE
+      value: gcr.io/uae-jp-development/to-redis #ここはよしなに
+    - name: DOCKERFILE
+      value: /workspace/Dockerfile

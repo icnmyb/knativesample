@@ -1,0 +1,35 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: kuro-port
+spec:
+  schedule: "*/2 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: to-redis
+            image: gcr.io/uae-jp-development/to-redis
+            volumeMounts:
+            - name: service-secret
+              mountPath: /var/keys/
+            env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/keys/key.json
+            envFrom:
+            - configMapRef:
+                name: redis-config
+            - configMapRef:
+                name: gcp-config
+            - configMapRef:
+                name: datastore-kind
+          volumes:
+          - name: service-secret
+            secret:
+              secretName: service-secret
+          - name: ssl-certs
+            hostPath:
+              path: /etc/ssl/certs
+          restartPolicy: OnFailure
